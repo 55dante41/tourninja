@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?libraries=places&key=AIzaSyCqYeMa0KpmrUDehCvtVLDb7W8FOy6vA3Y"></script>
+  <script src="/scripts/knockout-3.3.0.js" type="text/javascript"></script>
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon">
+  <link href='http://fonts.googleapis.com/css?family=Roboto' rel='stylesheet' type='text/css'>
+  <link href='http://fonts.googleapis.com/css?family=Lato' rel='stylesheet' type='text/css'>
+  <link href="/stylesheets/bootstrap.min.css" rel="stylesheet" type="text/css">
+  <script src="/scripts/bootstrap.min.js" type="text/css"></script>
+  <link href="http://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Roboto', sans-serif;
+    }
+
+    button:focus {
+      outline: 0 !important;
+    }
+
+    span.no-select {
+      -webkit-user-select: none;
+      /* webkit (safari, chrome) browsers */
+
+      -moz-user-select: none;
+      /* mozilla browsers */
+
+      -khtml-user-select: none;
+      /* webkit (konqueror) browsers */
+
+      -ms-user-select: none;
+      /* IE10+ */
+    }
+
+    .sidebar {
+      position: absolute;
+      background-color: whitesmoke;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      overflow-y: auto;
+    }
+
+    @media screen and (min-width: 320px) {
+      .sidebar {
+        width: 100%;
+      }
+      .searchbar-container {
+        position: absolute;
+        left: 100px;
+        top: 30px;
+        display: block;
+        width: 70%;
+      }
+      .searchbar {
+        padding: 10px;
+        border: none;
+        box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.75);
+      }
+      .searchsuggestions-container {
+        margin-top: 5px;
+        padding: 10px;
+        border: none;
+        box-shadow: 0px 2px 10px 0px rgba(0, 0, 0, 0.5);
+        background-color: whitesmoke;
+        max-height: 250px;
+        overflow-y: auto;
+        overflow-x: none;
+      }
+    }
+
+    @media screen and (min-width: 768px) {
+      .sidebar {
+        width: 25%;
+        -webkit-box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.75);
+        -moz-box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.75);
+        box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.75);
+      }
+      .searchbar-container {
+        position: absolute;
+        left: 100px;
+        top: 15px;
+        display: block;
+        width: 25%;
+      }
+      .searchbar {
+        padding: 10px;
+        border: none;
+        box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.75);
+      }
+      .searchsuggestions-container {
+        margin-top: 5px;
+        padding: 10px;
+        border: none;
+        box-shadow: 0px 2px 10px 0px rgba(0, 0, 0, 0.5);
+        background-color: whitesmoke;
+        max-height: 250px;
+        overflow-y: auto;
+        overflow-x: none;
+      }
+    }
+
+    .marked-location {
+      padding: 10px;
+      box-shadow: 0px 2px white;
+    }
+
+    .header {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 50px;
+      background-color: #2c3e50;
+    }
+
+    .body {
+      position: absolute;
+      top: 50px;
+      left: 0;
+      right: 0;
+      bottom: 0;
+    }
+
+    .map {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+    }
+
+    .header-brand {
+      display: inline-block;
+      padding: 0 0 0 5px;
+      cursor: pointer;
+      text-decoration: none !important;
+      font-family: 'Lato', sans-serif;
+    }
+
+    .carousel-control-button {
+      margin-top: 93px
+    }
+
+    .loader {
+      background-image: url(data:image/gif;base64,R0lGODlhEAALAPQAAP///0pISOTk5N3d3e/v705MTEpISGpoaKalpY6MjM3NzWJgYH59fauqqpCPj9DQ0GRjY0xKSoF/f+zs7OPi4vb29nFwcOXl5fX19crKyru6utnY2PLy8gAAAAAAAAAAACH/C05FVFNDQVBFMi4wAwEAAAAh/hpDcmVhdGVkIHdpdGggYWpheGxvYWQuaW5mbwAh+QQJCwAAACwAAAAAEAALAAAFLSAgjmRpnqSgCuLKAq5AEIM4zDVw03ve27ifDgfkEYe04kDIDC5zrtYKRa2WQgAh+QQJCwAAACwAAAAAEAALAAAFJGBhGAVgnqhpHIeRvsDawqns0qeN5+y967tYLyicBYE7EYkYAgAh+QQJCwAAACwAAAAAEAALAAAFNiAgjothLOOIJAkiGgxjpGKiKMkbz7SN6zIawJcDwIK9W/HISxGBzdHTuBNOmcJVCyoUlk7CEAAh+QQJCwAAACwAAAAAEAALAAAFNSAgjqQIRRFUAo3jNGIkSdHqPI8Tz3V55zuaDacDyIQ+YrBH+hWPzJFzOQQaeavWi7oqnVIhACH5BAkLAAAALAAAAAAQAAsAAAUyICCOZGme1rJY5kRRk7hI0mJSVUXJtF3iOl7tltsBZsNfUegjAY3I5sgFY55KqdX1GgIAIfkECQsAAAAsAAAAABAACwAABTcgII5kaZ4kcV2EqLJipmnZhWGXaOOitm2aXQ4g7P2Ct2ER4AMul00kj5g0Al8tADY2y6C+4FIIACH5BAkLAAAALAAAAAAQAAsAAAUvICCOZGme5ERRk6iy7qpyHCVStA3gNa/7txxwlwv2isSacYUc+l4tADQGQ1mvpBAAIfkECQsAAAAsAAAAABAACwAABS8gII5kaZ7kRFGTqLLuqnIcJVK0DeA1r/u3HHCXC/aKxJpxhRz6Xi0ANAZDWa+kEAA7AAAAAAAAAAAA);
+      height: 11px;
+      width: 16px;
+    }
+
+    .btn-circle {
+      width: 45px;
+      height: 45px;
+      text-align: center;
+      padding: 6px 0;
+      font-size: 20px;
+      line-height: 1.42;
+      border-radius: 50%;
+    }
+
+    .btn-circle-sm {
+      width: 40px;
+      height: 40px;
+      text-align: center;
+      padding: 6px 0;
+      font-size: 16px;
+      line-height: 1.42;
+      border-radius: 50%;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="header">
+    <a class="header-brand">
+      <span style="color: #9b59b6; font-size: 2.5em; font-weight: bold">tour</span>
+      <span style="color: #ecf0f1; font-size: 2.5em; font-weight: bold">map</span>
+      <span style="color: #f39c12">alpha</span>
+    </a>
+    <button class="btn btn-default btn-circle-sm" data-bind="click: openSidebar" style="position: absolute; right: 5px; top: 5px;"><i class="fa fa-bars"></i></button>
+  </div>
+  <div class="body">
+    <div id="mapCanvas" class="map"></div>
+    <div class="searchbar-container">
+      <input data-bind="textInput: filterQuery" class="searchbar" style="display: inline-block; width: 90%; padding: 10px">
+      <div data-bind="visible: showSuggestions, foreach: filteredLocations" class="searchsuggestions-container" style="width: 93%">
+        <a data-bind="text: name, click: $root.getLocationDetails" style="padding: 10px; text-decoration: none; display: block; cursor: pointer"></a>
+      </div>
+    </div>
+    <div id="sidebar" class="sidebar" data-bind="visible: showSidebar">
+      <div id="sidebar-header" style="background-color: #336e7b; width: 100%; height: 50px; padding: 5px">
+
+        <div class="col-xs-2" style="text-align: left; padding-left: 0px">
+          <button data-bind="click: showListOfLocations, visible: showLocationDetails" class="btn btn-default btn-md"><i class="fa fa-chevron-left"></i></button>
+        </div>
+        <div class="col-xs-8" style="text-align: center">
+
+        </div>
+        <div class="col-xs-2" style="text-align: right; padding-right: 0px">
+          <button data-bind="click: hideSidebar" class="btn btn-default btn-md"><i class="fa fa-times"></i></button>
+        </div>
+
+      </div>
+      <div id="markedlocations-container">
+        <div style="padding: 10px">
+          <button data-bind="click: showAllLocationMarkers" class="btn btn-default btn-circle"><i class="fa fa-map-marker"></i></button>
+          <span>Show all locations</span>
+        </div>
+        <div id="marked-locations" data-bind="visible: showLocations, foreach: locations">
+          <a data-bind="text: name, click: $root.getLocationDetails" style="padding: 10px; text-decoration: none; display: block; cursor: pointer"></a>
+        </div>
+      </div>
+      <div id="locationdetails-container" data-bind="with: selectedLocation, visible: showLocationDetails" style="padding: 5px">
+        <div data-bind="foreach: themes" style="padding: 10px 0px">
+          <a data-bind="text: $data" href="#" style="background-color: black; color: white; padding: 10px; text-decoration: none"></a>
+        </div>
+        <div style="padding: 5px">
+          <h5>Find nearby services: </h5>
+          <div style="display: inline-block; padding: 5px">
+            <button class="btn btn-default btn-circle" data-bind="click: $root.toggleNearbyAtmServicesForSelectedLocation"><i class="fa fa-credit-card"></i></button>
+            <span>ATMs</span>
+          </div>
+          <div style="display: inline-block; padding: 5px">
+            <button class="btn btn-default btn-circle" data-bind="click: $root.toggleNearbyGasStationServicesForSelectedLocation"><i class="fa fa-car"></i></button>
+            <span>Gas Stations</span>
+          </div>
+          <div style="display: inline-block; padding: 5px">
+            <button class="btn btn-default btn-circle" data-bind="click: $root.toggleNearbyGasStationServicesForSelectedLocation"><i class="fa fa-ambulance"></i></button>
+            <span>Medical Centers</span>
+          </div>
+          <h5>Find Offers: </h5>
+          <div style="display: inline-block; padding: 5px">
+            <button class="btn btn-default btn-circle" data-bind="click: $root.toggleNearbyAtmServicesForSelectedLocation"><i class="fa fa-binoculars"></i></button>
+            <span>Offers</span>
+          </div>
+        </div>
+        <div id="venuedetails-container" data-bind="with: venueDetails" style="min-height: 100px; position: relative; padding: 5px; border: 1px solid darkgray; margin-top: 5px">
+          <div data-bind="visible: $root.isLoading" class="loader" style="position: absolute; top: 50px; left: 50%; margin-left: 0px; margin-top: 0px;"></div>
+          <div>
+            <h4 data-bind="text: name" style="display: block"></h4>
+            <div data-bind="with: location">
+              <!-- ko if: 'address' in $data -->
+              <span data-bind="text: address"></span>,
+              <!-- /ko -->
+              <!-- ko if: 'city' in $data -->
+              <span data-bind="text: city"></span>-
+              <!-- /ko -->
+              <!-- ko if: 'postalCode' in $data -->
+              <span data-bind="text: postalCode"></span>,
+              <!-- /ko -->
+              <!-- ko if: 'country' in $data -->
+              <span data-bind="text: country"></span>
+              <!-- /ko -->
+            </div>
+            <!-- ko if: 'description' in $data -->
+            <h4 data-bind="text: description" style="display: block"></h4>
+            <!-- /ko -->
+            <h4>Venue pics:</h4>
+            <div class="carousel">
+              <div data-bind="foreach: photos.groups[0].items">
+                <div data-bind="visible: $index() === $root.venueImageInFocusInSelectedLocation()" style="text-align: center">
+                  <img data-bind="attr: {src: prefix + '200x200' + suffix}">
+                </div>
+              </div>
+              <a class="left carousel-control" data-bind="click: $root.focusPrevVenueImageInSelectedLocation" role="button">
+                <span class="fa fa-chevron-left no-select carousel-control-button"></span>
+              </a>
+              <a class="right carousel-control" data-bind="click: $root.focusNextVenueImageInSelectedLocation" role="button">
+                <span class="fa fa-chevron-right no-select carousel-control-button"></span>
+              </a>
+            </div>
+            <h4>Tips:</h4>
+            <div data-bind="foreach: tips.groups[tips.groups.length-1].items">
+              <div style="padding: 5px;">
+                <span data-bind="with: user">
+                  <img data-bind="attr: {src: photo.prefix + '30x30' + photo.suffix}" style="border-radius: 50%">
+                  <span data-bind="text: firstName"></span>
+                </span>
+                <span data-bind="text: text" style="display: block; padding: 5px; margin-top: 5px"></span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script type="text/javascript" src="/scripts/models.js"></script>
+  <script type="text/javascript" src="/scripts/services.js"></script>
+  <script type="text/javascript" src="/scripts/viewmodels.js"></script>
+  <script type="text/javascript" src="/scripts/mapBuilder.js"></script>
+</body>
+
+</html>

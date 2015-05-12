@@ -1,0 +1,28 @@
+{
+  "name": "tourmap-api",
+  "version": "1.0.0",
+  "description": "Backend service for tourmap's clients/applications",
+  "main": "server.js",
+  "scripts": {
+    "test": "test tourmap"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/devmaestro/tourmap-api.git"
+  },
+  "keywords": [
+    "tourmap",
+    "backend",
+    "api"
+  ],
+  "author": "devmaestro",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/devmaestro/tourmap-api/issues"
+  },
+  "homepage": "https://github.com/devmaestro/tourmap-api",
+  "dependencies": {
+    "restify": "^3.0.2",
+    "mongoose": "4.0.1"
+  }
+}

@@ -1,0 +1,28 @@
+{
+  "name": "tourmap-web",
+  "version": "1.0.0",
+  "description": "Web client for tourmap services",
+  "main": "server.js",
+  "scripts": {
+    "test": "test tourmap-web"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/devmaestro/tourmap-web.git"
+  },
+  "keywords": [
+    "web",
+    "tourmap",
+    "travel"
+  ],
+  "author": "devmaestro, chaudharyp",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/devmaestro/tourmap-web/issues"
+  },
+  "homepage": "https://github.com/devmaestro/tourmap-web",
+  "dependencies": {
+    "express": "^4.12.3",
+    "mongoose": "^4.0.1"
+  }
+}
