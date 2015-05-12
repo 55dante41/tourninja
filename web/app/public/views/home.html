@@ -169,6 +169,9 @@
       border-radius: 50%;
     }
   </style>
+  <script type="text/javascript" src="/scripts/models.js"></script>
+  <script type="text/javascript" src="/scripts/services.js"></script>
+  <script type="text/javascript" src="/scripts/viewmodels.js"></script>
 </head>
 
 <body>
@@ -184,11 +187,11 @@
     <div id="mapCanvas" class="map"></div>
     <div class="searchbar-container">
       <input data-bind="textInput: filterQuery" class="searchbar" style="display: inline-block; width: 90%; padding: 10px">
-      <div data-bind="visible: showSuggestions, foreach: filteredLocations" class="searchsuggestions-container" style="width: 93%">
+      <div data-bind="visible: showSuggestions, foreach: filteredLocations" class="searchsuggestions-container" style="width: 93%; display: none">
         <a data-bind="text: name, click: $root.getLocationDetails" style="padding: 10px; text-decoration: none; display: block; cursor: pointer"></a>
       </div>
     </div>
-    <div id="sidebar" class="sidebar" data-bind="visible: showSidebar">
+    <div id="sidebar" class="sidebar" data-bind="visible: showSidebar" style="display: none">
       <div id="sidebar-header" style="background-color: #336e7b; width: 100%; height: 50px; padding: 5px">
 
         <div class="col-xs-2" style="text-align: left; padding-left: 0px">
@@ -285,10 +288,8 @@
       </div>
     </div>
   </div>
-  <script type="text/javascript" src="/scripts/models.js"></script>
-  <script type="text/javascript" src="/scripts/services.js"></script>
-  <script type="text/javascript" src="/scripts/viewmodels.js"></script>
   <script type="text/javascript" src="/scripts/mapBuilder.js"></script>
+
 </body>
 
 </html>
